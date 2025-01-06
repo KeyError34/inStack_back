@@ -1,5 +1,5 @@
 {
-  "name": "miniproj_auth",
+  "name": "inStack_back",
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "KeyError34",
   "license": "ISC",
-  "description": "card",
+  "description": "project for people in IT industry",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
