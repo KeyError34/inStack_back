@@ -5,7 +5,7 @@ export interface ILike extends Document {
   post: Types.ObjectId;
 }
 
-const likeSchema = new Schema<ILike>(
+const likeCommentSchema = new Schema<ILike>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     post: { type: Schema.Types.ObjectId, ref: 'Comment', required: true },
@@ -13,5 +13,5 @@ const likeSchema = new Schema<ILike>(
   { timestamps: true }
 );
 
-const Like = model<ILike>('LikeComment', likeSchema);
+const Like = model<ILike>('LikeComment', likeCommentSchema);
 export default Like;

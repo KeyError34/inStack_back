@@ -1,7 +1,4 @@
 import { Response } from 'express';
-
-
-
 interface IResponseData<T> {
   message: string;
   data?: T;

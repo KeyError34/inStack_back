@@ -1,11 +1,11 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
 export interface ILike extends Document {
-  user: Types.ObjectId;
-  post: Types.ObjectId;
+  user: Types.ObjectId; // who liked
+  post: Types.ObjectId; // where liked
 }
 
-const likeSchema = new Schema<ILike>(
+const likePostSchema = new Schema<ILike>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     post: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
@@ -13,5 +13,5 @@ const likeSchema = new Schema<ILike>(
   { timestamps: true }
 );
 
-const Like = model<ILike>('LikePost', likeSchema);
+const Like = model<ILike>('LikePost', likePostSchema);
 export default Like
