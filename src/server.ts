@@ -1,6 +1,8 @@
 import express, { Application } from 'express'
+import cors from 'cors'
 import connectDB from './config/db'
 import authRouter from './routes/authRouter'
+import resetPasswordRouter from './routes/passwordResetRouter'
 class AppServer {
   private app: Application;
   private port: number;
@@ -20,11 +22,13 @@ class AppServer {
     }
   }
   private setMiddlewares(): void {
+    this.app.use(cors())
     this.app.use(express.json());
     this.app.use(express.urlencoded());
   }
   private setRoutes(): void {
     this.app.use('/api/auth', authRouter);
+    this.app.use('/api', resetPasswordRouter);
   }
   public startServer(): void {
     this.app.listen(this.port, () => {

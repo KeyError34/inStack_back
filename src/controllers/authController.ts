@@ -66,12 +66,32 @@ class AuthController {
   public async login(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, password } = req.body;
-      if (!username || !email || password) {
+      if ((!username && !password) || (!email && !password)) {
         return sendResponse(res, 400, {
-          message: 'Username and password are required',
+          message: 'Oll feild are required',
         });
       }
-    } catch (error) {}
+      const user = await User.findOne({ $or: [{ username }, { email }] });
+      if (!user) {
+        return sendResponse(res, 400, { message: 'Invalid credentials' });
+      }
+      const token = JwtService.generateToken({
+        id: user._id,
+        username: user.username,
+        role: user.role,
+      });
+      return sendResponse(res, 200, {
+        message: 'Login successful',
+        token,
+        data: {
+          id: user._id,
+          username: user.username,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      return sendResponse(res, 500, { message: 'Server error' });
+    }
   }
 }
 

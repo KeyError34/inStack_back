@@ -4,12 +4,13 @@ class JwtService {
   private readonly secretKey: string;
   private readonly expiresIn: string;
 
-  constructor(secretKey: string, expiresIn: string = '1h') {
+  constructor(secretKey: string, expiresIn: string = '12h') {
     this.secretKey = secretKey;
     this.expiresIn = expiresIn;
   }
 
   // Метод для создания токена
+  
   public generateToken(
     payload: Record<string, unknown>,
     options?: SignOptions
