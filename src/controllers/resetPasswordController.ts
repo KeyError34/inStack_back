@@ -21,7 +21,7 @@ class PasswordResetController {
         return sendResponse(res, 400, { message: 'Email not found' });
       }
 
-      // Генерация JWT токена (действителен 1 час)
+      // Генерация JWT токена (действителен 15 мин)
       const token = JwtService.generateToken({ email }, { expiresIn: '15m' });
 
       // Сохранение токена в базе

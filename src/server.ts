@@ -3,6 +3,7 @@ import cors from 'cors'
 import connectDB from './config/db'
 import authRouter from './routes/authRouter'
 import resetPasswordRouter from './routes/passwordResetRouter'
+import postRouter from './routes/postRouter';
 class AppServer {
   private app: Application;
   private port: number;
@@ -29,6 +30,7 @@ class AppServer {
   private setRoutes(): void {
     this.app.use('/api/auth', authRouter);
     this.app.use('/api', resetPasswordRouter);
+     this.app.use('/api/post', postRouter);
   }
   public startServer(): void {
     this.app.listen(this.port, () => {

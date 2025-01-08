@@ -78,3 +78,64 @@ API
       {
           "message": "Password successfully reset"
       }
+
+3.  Post
+  - link to
+    http://localhost:3333/api/post/create
+
+   - -example
+
+    import axios from 'axios';
+
+    const createPost = async (content, images = [], video = null) => {
+      const formData = new FormData();
+      formData.append('content', content);
+
+      // Добавляем изображения, если они есть
+      if (Array.isArray(images) && images.length > 0) {
+        images.forEach((image) => formData.append('images', image));
+      }
+
+      // Добавляем видео, если оно есть
+      if (video) {
+        formData.append('video', video);
+      }
+
+      // Проверяем, есть ли вообще файлы для загрузки
+      if (!formData.has('images') && !formData.has('video')) {
+        console.error('Ошибка: Нет файлов для загрузки.');
+        return;
+      }
+
+      try {
+        const response = await axios.post('/api/posts', formData, {
+          headers: {
+            'Authorization': Bearer ${localStorage.getItem('token')},
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        console.log('Пост создан:', response.data);
+      } catch (error) {
+        console.error('Ошибка при создании поста:', error.response?.data || error.message);
+      }
+    };
+
+    export default createPost;
+     
+     -answer
+     {
+    "user": "677c2bdbc5312806cf1036ae",
+    "content": "fanny",
+    "imageUrls": [
+        "https://res.cloudinary.com/drwrhviwk/image/upload/v1736334038/mrg8khmtbwglikdmglr9.webp"
+    ],
+    "videoUrl": "",
+    "likesCount": 0,
+    "comments": [],
+    "reposts": [],
+    "_id": "677e5ad55cacd3ceb22402e8",
+    "createdAt": "2025-01-08T11:00:37.923Z",
+    "updatedAt": "2025-01-08T11:00:37.923Z",
+    "__v": 0
+    }

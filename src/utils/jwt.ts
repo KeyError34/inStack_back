@@ -1,5 +1,6 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 import 'dotenv/config';
+
 class JwtService {
   private readonly secretKey: string;
   private readonly expiresIn: string;
@@ -9,8 +10,6 @@ class JwtService {
     this.expiresIn = expiresIn;
   }
 
-  // Метод для создания токена
-  
   public generateToken(
     payload: Record<string, unknown>,
     options?: SignOptions
@@ -21,14 +20,11 @@ class JwtService {
     });
   }
 
-  // Метод для проверки токена
   public verifyToken(token: string): Record<string, unknown> | null {
     try {
       return jwt.verify(token, this.secretKey) as Record<string, unknown>;
     } catch (error) {
-      console.error('Invalid token:', {
-        error: (error as Error).message,
-      });
+      console.error('Invalid token:', { error: (error as Error).message });
       return null;
     }
   }
