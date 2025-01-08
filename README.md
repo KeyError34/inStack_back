@@ -108,7 +108,7 @@ API
       }
 
       try {
-        const response = await axios.post('/api/posts', formData, {
+        const response = await axios.post('post/create', formData, {
           headers: {
             'Authorization': Bearer ${localStorage.getItem('token')},
             'Content-Type': 'multipart/form-data',

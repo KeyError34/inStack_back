@@ -1,4 +1,3 @@
-
 // тут this.uploadToCloudinary this не сработает
 // ну или нужно будет сделать один экземпляр и использовать его
 // и получается что вызывается статик метод который дергает обычный
@@ -11,8 +10,8 @@
 import { Request, Response } from 'express';
 import Post from '../models/Post';
 import { FileCompressor } from '../utils/fileCompressor';
-import { FileUploader } from '../utils/fileUplouder'; 
-
+import { FileUploader } from '../utils/fileUplouder';
+import { sendResponse } from '../utils/responseUtils';
 class PostController {
   // Создание поста
   async createPost(req: Request, res: Response): Promise<void> {
@@ -58,13 +57,14 @@ class PostController {
 
       // Если не загружены изображения или видео, отправляем ошибку
       if (imageUrls.length === 0 && !videoUrl) {
-        res.status(400).json({ message: 'No images or videos uploaded' });
-        return;
+        return sendResponse(res, 400, {
+          message: 'No images or videos uploaded',
+        });
       }
 
       // Создание поста с возможностью добавления URL изображений и видео
       const post = new Post({
-        user: req.user?.id, 
+        user: req.user?.id,
         content: req.body.content,
         imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
         videoUrl: videoUrl ?? undefined,
@@ -73,16 +73,21 @@ class PostController {
         reposts: [],
       });
 
-      // Сохраняем пост в базе данных
       await post.save();
 
       // Отправляем успешный ответ с данными поста
-      res.status(201).json(post);
+      // res.status(201).json(post);
+      return sendResponse(res, 201, {
+        message: 'Post successfully created',
+        data: post,
+      });
     } catch (error) {
       console.error('Error creating post:', error);
-      res.status(500).json({
+      return sendResponse(res, 500, {
         message: 'Error creating post',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        data: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
       });
     }
   }

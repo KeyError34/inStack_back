@@ -1,7 +1,4 @@
 import { Schema, model, Document, Types } from 'mongoose';
-
-
-
 export interface IUserProfile extends Document {
   user: Types.ObjectId;
   avatarUrl: string;
