@@ -1,7 +1,8 @@
 import { Schema, model, Document, Types } from 'mongoose';
 export interface IUserProfile extends Document {
   user: Types.ObjectId;
-  avatarUrl: string;
+  avatar: Buffer;
+  avatarContentType?: string;
   bio: string;
   gender: 'male' | 'female' | 'other';
   address: {
@@ -16,11 +17,11 @@ export interface IUserProfile extends Document {
   following: Types.ObjectId[]; // Подписки
 }
 
-
 const userProfileSchema = new Schema<IUserProfile>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    avatarUrl: { type: String, default: '' },
+    avatar: { type: Buffer },
+    avatarContentType: { type: String },
     bio: { type: String, default: '' },
     gender: {
       type: String,
@@ -40,7 +41,6 @@ const userProfileSchema = new Schema<IUserProfile>(
   },
   { timestamps: true }
 );
-
 
 const UserProfile = model<IUserProfile>('UserProfile', userProfileSchema);
 

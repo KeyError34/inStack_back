@@ -3,10 +3,9 @@ import UserProfile from '../models/UserProfile';
 import { sendResponse } from '../utils/responseUtils';
 
 class UserProfileController {
+  // Получить профиль текущего пользователя (GET)
 
-   // Получить профиль текущего пользователя (GET)
-
-  static async getProfile(req: Request, res: Response) {
+  static async getProfile(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -32,10 +31,9 @@ class UserProfileController {
     }
   }
 
-  
-   // Создать новый профиль пользователя (POST)
+  // Создать новый профиль пользователя (POST)
 
-  static async createProfile(req: Request, res: Response) {
+  static async createProfile(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -60,10 +58,9 @@ class UserProfileController {
     }
   }
 
+  //Обновить профиль пользователя (PUT)
 
-   //Обновить профиль пользователя (PUT)
-
-  static async updateProfile(req: Request, res: Response) {
+  static async updateProfile(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {

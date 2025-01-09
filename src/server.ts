@@ -5,6 +5,7 @@ import authRouter from './routes/authRouter';
 import resetPasswordRouter from './routes/passwordResetRouter';
 import postRouter from './routes/postRouter';
 import userRouter from './routes/userRouter';
+import avatarRouter from './routes/avatarRouter'
 class AppServer {
   private app: Application;
   private port: number;
@@ -32,7 +33,8 @@ class AppServer {
     this.app.use('/api/auth', authRouter);
     this.app.use('/api', resetPasswordRouter);
     this.app.use('/api/post', postRouter);
-    this.app.use('/api/', userRouter)
+    this.app.use('/api', userRouter)
+    this.app.use('/api', avatarRouter);
   }
   public startServer(): void {
     this.app.listen(this.port, () => {

@@ -75,8 +75,6 @@ class PostController {
 
       await post.save();
 
-      // Отправляем успешный ответ с данными поста
-      // res.status(201).json(post);
       return sendResponse(res, 201, {
         message: 'Post successfully created',
         data: post,

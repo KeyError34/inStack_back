@@ -139,3 +139,116 @@ API
     "updatedAt": "2025-01-08T11:00:37.923Z",
     "__v": 0
     }
+
+4. User
+ -  POST (create new)
+ - http://localhost:3333/api/profile 
+
+  - example
+    const createProfile = async (profileData: { age: number; bio: string }) => {
+      try {
+        const response = await axios.post('http://localhost:5000/profile', profileData, {
+          headers: {
+            Authorization: Bearer ${localStorage.getItem('token')},
+          },
+        });
+
+        console.log('Профиль создан:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Ошибка создания профиля:', error.response?.data || error);
+      }
+    };
+
+ -  GET
+ - http://localhost:3333/api/profile 
+
+  - example
+   
+   import axios from 'axios';
+
+    const getProfile = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/profile', {
+          headers: {
+            Authorization: Bearer ${localStorage.getItem('token')},
+          },
+        });
+
+        console.log('Профиль:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Ошибка получения профиля:', error.response?.data || error);
+      }
+    };
+
+ -  PUT
+ - http://localhost:3333/api/profile 
+
+ - example
+
+  const updateProfile = async (updatedData: { age?: number; bio?: string }) => {
+    try {
+      const response = await axios.put('http://localhost:5000/profile', updatedData, {
+        headers: {
+          Authorization: Bearer ${localStorage.getItem('token')},
+        },
+      });
+
+      console.log('Профиль обновлен:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Ошибка обновления профиля:', error.response?.data || error);
+    }
+  };
+  
+5.Avatar 
+ - POST /upload-avatar
+   http://localhost:3333/api/upload-avata
+   +
+   'Authorization': Bearer ${localStorage.getItem('token')}
+   +
+   file
+
+    -example
+    import axios from 'axios';
+
+    const uploadAvatar = async (file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file); // 'avatar' — key for multer
+
+      try {
+        const response = await axios.post(
+          'http://localhost:5000/upload-avatar',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: Bearer ${localStorage.getItem('token')}, // JWT token
+            },
+          }
+        );
+        console.log('Аватар загружен:', response.data);
+      } catch (error) {
+        console.error('Avatar loading error:', error);
+      }
+    };
+
+ - GET /avatar
+    http://localhost:5000/api/avatar
+    +
+    'Authorization': Bearer ${localStorage.getItem('token')}
+
+   -example
+      const getMyAvatar = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/avatar', {
+          headers: { Authorization: Bearer ${localStorage.getItem('token')} },
+          responseType: 'blob',
+        });
+
+        return URL.createObjectURL(response.data);
+      } catch (error) {
+        console.error('Error getting avatar:', error);
+      }
+    };
