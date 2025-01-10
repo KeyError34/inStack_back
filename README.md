@@ -60,7 +60,7 @@ API
       -answer
       {
           "message": "Reset link sent to email",
-          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhenlueXVrQGdtYWlsLmNvbSIsImlhdCI6MTczNjE5MTUxNywiZXhwIjoxNzM2MjM0NzE3fQ.Ap60GqusthGQIh_BdBjlPi2MiEbayAgPNP4JNb3_h9A"
+          
       }
 
    - link to enter a new password
@@ -68,11 +68,28 @@ API
      - http://localhost:3333/api/reset-password
       
       -example
-      {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxhenlueXVrQGdtYWlsLmNvbSIsImlhdCI6MTczNjE5MTUxNywiZXhwIjoxNzM2MjM0NzE3fQ.Ap60GqusthGQIh_BdBjlPi2MiEbayAgPNP4JNb3_h9A",
-        "newPassword":"new564"
-        
-      }
+      import axios from "axios";
+
+      const API_URL = "http://localhost:3333/api";
+
+      export const resetPassword = async (newPassword: string) => {
+        try {
+          const token = new URLSearchParams(window.location.search).get("token"); // Достаем токен прямо в запросе
+
+          if (!token) {
+            throw new Error("Token is missing from URL!");
+          }
+
+          const response = await axios.post(${API_URL}/reset-password, {
+            token,
+            newPassword,
+          });
+
+          return response.data;
+        } catch (error) {
+          throw error.response?.data?.message || "Error changing password";
+        }
+      };
 
       -answer
       {
@@ -103,7 +120,7 @@ API
 
       // Проверяем, есть ли вообще файлы для загрузки
       if (!formData.has('images') && !formData.has('video')) {
-        console.error('Ошибка: Нет файлов для загрузки.');
+        console.error('Error: No files to upload.');
         return;
       }
 
@@ -115,9 +132,9 @@ API
           },
         });
 
-        console.log('Пост создан:', response.data);
+        console.log('Post created:', response.data);
       } catch (error) {
-        console.error('Ошибка при создании поста:', error.response?.data || error.message);
+        console.error('Error creating post:', error.response?.data || error.message);
       }
     };
 
@@ -151,12 +168,12 @@ API
           headers: {
             Authorization: Bearer ${localStorage.getItem('token')},
           },
-        });
+        }); 
 
-        console.log('Профиль создан:', response.data);
+        console.log('Profile created:', response.data);
         return response.data;
       } catch (error) {
-        console.error('Ошибка создания профиля:', error.response?.data || error);
+        console.error('Error creating profile:', error.response?.data || error);
       }
     };
 
@@ -175,10 +192,10 @@ API
           },
         });
 
-        console.log('Профиль:', response.data);
+        console.log('Profile:', response.data);
         return response.data;
       } catch (error) {
-        console.error('Ошибка получения профиля:', error.response?.data || error);
+        console.error('Error getting profile:', error.response?.data || error);
       }
     };
 
@@ -195,10 +212,10 @@ API
         },
       });
 
-      console.log('Профиль обновлен:', response.data);
+      console.log('Profile updated:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Ошибка обновления профиля:', error.response?.data || error);
+      console.error('Profile update error:', error.response?.data || error);
     }
   };
   
@@ -228,7 +245,7 @@ API
             },
           }
         );
-        console.log('Аватар загружен:', response.data);
+        console.log('Avatar uploaded:', response.data);
       } catch (error) {
         console.error('Avatar loading error:', error);
       }

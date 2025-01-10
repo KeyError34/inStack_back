@@ -32,7 +32,7 @@ class PasswordResetController {
       });
 
       // Отправка письма со ссылкой
-      const resetLink = `http://localhost:3333/api/reset-password?token=${token}`;
+      const resetLink = `http://localhost:3000/reset-password?token=${token}`;
       await sendEmail(
         {
           to: email,
@@ -45,7 +45,6 @@ class PasswordResetController {
 
       return sendResponse(res, 200, {
         message: 'Reset link sent to email',
-        token,
       });
     } catch (error) {
       console.error(error);
