@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { sendResponse } from '../utils/responseUtils';
 import JwtService from '../utils/jwt';
 class AuthController {
-  public async register(req: Request, res: Response): Promise<void> {
+  static async register(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, fullName, password } = req.body;
 
@@ -63,7 +63,7 @@ class AuthController {
       return sendResponse(res, 500, { message: 'Server error' });
     }
   }
-  public async login(req: Request, res: Response): Promise<void> {
+  static async login(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, password } = req.body;
       if ((!username && !password) || (!email && !password)) {

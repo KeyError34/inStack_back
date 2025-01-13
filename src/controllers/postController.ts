@@ -12,10 +12,10 @@ import Post from '../models/Post';
 import { FileCompressor } from '../utils/fileCompressor';
 import { FileUploader } from '../utils/fileUplouder';
 import { sendResponse } from '../utils/responseUtils';
-import {extractPublicId} from '../utils/extractPublicId'
+import { extractPublicId } from '../utils/extractPublicId';
 class PostController {
   // Создание поста
-  async createPost(req: Request, res: Response): Promise<void> {
+  public async createPost(req: Request, res: Response): Promise<void> {
     try {
       const imageUrls: string[] = [];
       let videoUrl: string | undefined = '';
@@ -94,7 +94,7 @@ class PostController {
     }
   }
   // Получение поста по id
-  async getPost(req: Request, res: Response): Promise<void> {
+  public async getPost(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
       const post = await Post.findById(postId)
@@ -117,7 +117,7 @@ class PostController {
       });
     }
   }
-  async editPost(req: Request, res: Response): Promise<void> {
+  public async editPost(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
       const userId = req.user?.id;
@@ -190,56 +190,54 @@ class PostController {
     }
   }
 
-  async deletePost(req: Request, res: Response): Promise<void> {
-  try {
-    const { postId } = req.params;
-    const userId = req.user?.id;
-    const post = await Post.findById(postId);
-    
-    if (!post) {
-      return sendResponse(res, 404, { message: 'Post not found' });
-    }
+  public async deletePost(req: Request, res: Response): Promise<void> {
+    try {
+      const { postId } = req.params;
+      const userId = req.user?.id;
+      const post = await Post.findById(postId);
 
-    if (post.user.toString() !== userId) {
-      return sendResponse(res, 403, {
-        message: 'You are not the owner of this post',
-      });
-    }
+      if (!post) {
+        return sendResponse(res, 404, { message: 'Post not found' });
+      }
 
-    // Удаление файлов из Cloudinary
-    // Удаляем изображения
-    if (post.imageUrls && post.imageUrls.length > 0) {
-      for (const imageUrl of post.imageUrls) {
-        const publicId = extractPublicId(imageUrl);
+      if (post.user.toString() !== userId) {
+        return sendResponse(res, 403, {
+          message: 'You are not the owner of this post',
+        });
+      }
+
+      // Удаление файлов из Cloudinary
+      // Удаляем изображения
+      if (post.imageUrls && post.imageUrls.length > 0) {
+        for (const imageUrl of post.imageUrls) {
+          const publicId = extractPublicId(imageUrl);
+          if (publicId) {
+            await FileUploader.deleteFromCloudinary(publicId);
+          }
+        }
+      }
+
+      // Удаляем видео, если оно есть
+      if (post.videoUrl) {
+        const publicId = extractPublicId(post.videoUrl);
         if (publicId) {
           await FileUploader.deleteFromCloudinary(publicId);
         }
       }
+
+      // Удаление поста из базы данных
+      await post.deleteOne();
+
+      return sendResponse(res, 200, {
+        message: 'Post and associated files deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      return sendResponse(res, 500, {
+        message: 'Error deleting post',
+      });
     }
-
-    // Удаляем видео, если оно есть
-    if (post.videoUrl) {
-      const publicId = extractPublicId(post.videoUrl);
-      if (publicId) {
-        await FileUploader.deleteFromCloudinary(publicId);
-      }
-    }
-
-    // Удаление поста из базы данных
-    await post.deleteOne();
-
-    return sendResponse(res, 200, {
-      message: 'Post and associated files deleted successfully',
-    });
-  } catch (error) {
-    console.error('Error deleting post:', error);
-    return sendResponse(res, 500, {
-      message: 'Error deleting post',
-    });
   }
-}
-
-
 }
 
 export default new PostController();
