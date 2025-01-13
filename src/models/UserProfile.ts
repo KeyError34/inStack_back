@@ -15,6 +15,8 @@ export interface IUserProfile extends Document {
   education?: string;
   followers: Types.ObjectId[]; // Подписчики
   following: Types.ObjectId[]; // Подписки
+  followersCount: number;
+  followingCount: number;
 }
 
 const userProfileSchema = new Schema<IUserProfile>(
@@ -38,6 +40,8 @@ const userProfileSchema = new Schema<IUserProfile>(
     education: { type: String },
     followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    followersCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -39,4 +39,19 @@ export class FileUploader {
       throw new Error('Failed to upload file to Cloudinary');
     }
   }
+  // Метод для удаления файла из Cloudinary
+  public static async deleteFromCloudinary(publicId: string): Promise<void> {
+    try {
+      const result = await cloudinary.uploader.destroy(publicId);
+      if (result.result === 'ok') {
+        console.log(`File with public ID ${publicId} has been deleted from Cloudinary.`);
+      } else {
+        console.error(`Error deleting file with public ID ${publicId}: ${result.error}`);
+        throw new Error(`Failed to delete file from Cloudinary: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error during Cloudinary deletion:', error);
+      throw new Error('Failed to delete file from Cloudinary');
+    }
+  }
 }

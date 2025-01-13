@@ -5,9 +5,12 @@ export interface IPost extends Document {
   content: string;
   imageUrls?: string[];
   videoUrl?: string;
+  likes: Types.ObjectId[];
   likesCount: number;
   comments: Types.ObjectId[];
+  commentsCount: number;
   reposts: Types.ObjectId[];
+  repostsCount: number;
 }
 
 const postSchema = new Schema<IPost>(
@@ -17,7 +20,10 @@ const postSchema = new Schema<IPost>(
     imageUrls: [{ type: String }],
     videoUrl: { type: String },
     likesCount: { type: Number, default: 0 },
-    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+    likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    commentsCount: { type: Number, default: 0 },
+    comments: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    repostsCount: { type: Number, default: 0 },
     reposts: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }

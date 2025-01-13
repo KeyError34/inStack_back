@@ -97,7 +97,8 @@ API
       }
 
 3.  Post
-  - link to
+  *-* POST 
+    link to create
     http://localhost:3333/api/post/create
 
    - -example
@@ -141,21 +142,166 @@ API
     export default createPost;
      
      -answer
-     {
-    "user": "677c2bdbc5312806cf1036ae",
-    "content": "fanny",
-    "imageUrls": [
-        "https://res.cloudinary.com/drwrhviwk/image/upload/v1736334038/mrg8khmtbwglikdmglr9.webp"
-    ],
-    "videoUrl": "",
-    "likesCount": 0,
-    "comments": [],
-    "reposts": [],
-    "_id": "677e5ad55cacd3ceb22402e8",
-    "createdAt": "2025-01-08T11:00:37.923Z",
-    "updatedAt": "2025-01-08T11:00:37.923Z",
-    "__v": 0
+   {
+    "message": "Post successfully created",
+    "data": {
+        "post_id": "6784ef30f189443ad14c61e5",
+        "user": "677c2bdbc5312806cf1036ae",
+        "content": "fanny",
+        "imageUrls": [
+            "https://res.cloudinary.com/drwrhviwk/image/upload/v1736765230/p2gd7qmnloihggvgmbtl.webp",
+            "https://res.cloudinary.com/drwrhviwk/image/upload/v1736765232/ofkcwejr9f7qwoyicbzg.webp"
+        ],
+        "videoUrl": "",
+        "likesCount": 0,
+        "likes": [],
+        "commentsCount": 0,
+        "comments": [],
+        "repostsCount": 0,
+        "reposts": [],
+        "_id": "6784ef30f189443ad14c61e5",
+        "createdAt": "2025-01-13T10:47:12.335Z",
+        "updatedAt": "2025-01-13T10:47:12.335Z",
+        "__v": 0
     }
+}
+  *-* GET 
+  http://localhost:3333/api/post/:postId
+
+  import axios from 'axios';
+
+  async function getPost(postId) {
+    try {
+      // Отправляем GET-запрос на сервер
+      const response = await axios.get(http://localhost:5000/post/${postId});
+
+      // Если запрос успешен, обработаем данные
+      console.log('Post data:', response.data);
+    } catch (error) {
+      // Если запрос не удался, обработаем ошибку
+      console.error('Error fetching post:', error.response ? error.response.data : error.message);
+    }
+  }
+
+  // Пример вызова функции с postId
+  getPost('your-post-id');
+
+  - answer
+  {
+    "message": "Post successfully getted",
+    "data": {
+        "_id": "6784ef30f189443ad14c61e5",
+        "user": {
+            "_id": "677c2bdbc5312806cf1036ae",
+            "username": "Ole34"
+        },
+        "content": "fanny",
+        "imageUrls": [
+            "https://res.cloudinary.com/drwrhviwk/image/upload/v1736765230/p2gd7qmnloihggvgmbtl.webp",
+            "https://res.cloudinary.com/drwrhviwk/image/upload/v1736765232/ofkcwejr9f7qwoyicbzg.webp"
+        ],
+        "videoUrl": "",
+        "likesCount": 0,
+        "likes": [],
+        "commentsCount": 0,
+        "comments": [],
+        "repostsCount": 0,
+        "reposts": [],
+        "createdAt": "2025-01-13T10:47:12.335Z",
+        "updatedAt": "2025-01-13T10:47:12.335Z",
+        "__v": 0
+    }
+   }
+  *-* PUT 
+    http://localhost:3333/api/post/:postId
+   
+  - example
+
+  import axios from 'axios';
+
+  // Получение JWT токена из localStorage
+  const token = localStorage.getItem('jwtToken'); // Замените на ваш ключ, если он отличается
+
+  // URL и ID поста
+  const postId = '12345'; // замените на ID поста
+
+  // Подготовка формы для отправки данных
+  const formData = new FormData();
+  formData.append('content', 'Новый контент для поста'); // новый контент
+  formData.append('images', imageFile); // Замените imageFile на ваш файл изображения
+  formData.append('video', videoFile); // Замените videoFile на ваш файл видео
+
+  // Отправка запроса через Axios с использованием токена из localStorage
+  axios.put(http://localhost:5000/post/${postId}, formData, {
+    headers: {
+      'Authorization': Bearer ${token},
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+    .then(response => {
+      console.log('Post updated:', response.data);
+    })
+    .catch(error => {
+      console.error('Error updating post:', error.response?.data || error.message);
+    });
+
+  - answer
+    {
+      "message": "Post updated successfully",
+      "data": {
+          "_id": "6784ef30f189443ad14c61e5",
+          "user": "677c2bdbc5312806cf1036ae",
+          "content": "bilding",
+          "imageUrls": [
+              "https://res.cloudinary.com/drwrhviwk/image/upload/v1736772712/fpybsynqorjpteqwqyhi.webp"
+          ],
+          "videoUrl": "",
+          "likesCount": 0,
+          "likes": [],
+          "commentsCount": 0,
+          "comments": [],
+          "repostsCount": 0,
+          "reposts": [],
+          "createdAt": "2025-01-13T10:47:12.335Z",
+          "updatedAt": "2025-01-13T12:51:52.579Z",
+          "__v": 1
+      }
+    }
+  - DELETE
+    http://localhost:3333/api/post/:postId
+
+    import axios from 'axios';
+
+    const deletePost = async (postId: string) => {
+      try {
+        // Получаем токен из localStorage
+        const token = localStorage.getItem('jwt_token'); // предполагаем, что токен хранится под этим ключом
+        
+        if (!token) {
+          console.error('No token found in localStorage');
+          return;
+        }
+
+        const response = await axios.delete(http://localhost:3000/api/post/${postId}, {
+          headers: {
+            Authorization: Bearer ${token},
+          },
+        });
+        console.log('Post deleted successfully:', response.data);
+      } catch (error) {
+        console.error('Error deleting post:', error);
+      }
+    };
+
+    // Пример вызова функции
+    const postId = '60a4db16a2bc3d1c4f6e4e1b'; // ID поста, который нужно удалить
+
+    deletePost(postId);
+
+  - answer
+  {
+    "message": "Post and associated files deleted successfully"
+  }
 
 4. User
  -  POST (create new)
