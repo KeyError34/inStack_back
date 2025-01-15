@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import Post from '../models/Post';
+import UserProfile from '../models/UserProfile';
 import { Types } from 'mongoose';
 import { FileCompressor } from '../utils/fileCompressor';
 import { FileUploader } from '../utils/fileUplouder';
@@ -93,7 +94,7 @@ class PostController {
       console.log('Registered models:', mongoose.modelNames());
       const { postId } = req.params;
 
-      console.log('Received postId:', postId); 
+      console.log('Received postId:', postId);
 
       if (!mongoose.Types.ObjectId.isValid(postId)) {
         console.log('Invalid post ID:', postId);
@@ -108,7 +109,7 @@ class PostController {
         })
         .populate('reposts', 'username avatar');
 
-      console.log('Post found:', post); 
+      console.log('Post found:', post);
 
       if (!post) {
         return sendResponse(res, 404, { message: 'Post not found' });
@@ -119,7 +120,7 @@ class PostController {
         data: post,
       });
     } catch (error) {
-      console.error('Error retrieving post:', error); 
+      console.error('Error retrieving post:', error);
       return sendResponse(res, 500, {
         message: 'Error retrieving post',
         data: { error },
@@ -279,6 +280,48 @@ class PostController {
       });
     } catch (error) {
       return sendResponse(res, 500, { message: 'Error toggling like' });
+    }
+  }
+  public async addRepost(req: Request, res: Response): Promise<void> {
+    try {
+      const { postId } = req.params;
+      const userId = req.user?.id;
+
+      const post = await Post.findById(postId);
+      if (!post) {
+        return sendResponse(res, 404, { message: 'Post not found' });
+      }
+
+      // Проверка, если пост уже был репостнут этим пользователем
+      if (post.reposts.includes(new Types.ObjectId(userId))) {
+        return sendResponse(res, 400, {
+          message: 'You have already reposted this post',
+        });
+      }
+
+      // Добавляем репост и увеличиваем счетчик
+      post.reposts.push(new Types.ObjectId(userId));
+      post.repostsCount += 1;
+      await post.save();
+
+      // Теперь добавляем этот пост в репосты профиля пользователя
+      const userProfile = await UserProfile.findOne({ user: userId });
+      if (!userProfile) {
+        return sendResponse(res, 404, { message: 'User profile not found' });
+      }
+
+      // Добавляем пост в массив repostedPosts, если его там нет
+      if (!userProfile.repostedPosts.includes(new Types.ObjectId(userId))) {
+        userProfile.repostedPosts.push(new Types.ObjectId(userId));
+        await userProfile.save();
+      }
+
+      return sendResponse(res, 200, {
+        message: 'Post reposted successfully',
+        data: post,
+      });
+    } catch (error) {
+      return sendResponse(res, 500, { message: 'Error adding repost' });
     }
   }
 }

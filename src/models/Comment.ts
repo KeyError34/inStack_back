@@ -6,6 +6,8 @@ export interface IComment extends Document {
   content: string;
   likes: Types.ObjectId[];
   likesCount: number;
+  replies: Types.ObjectId[]; //  ответ на комментарий
+  repliesCount: number; // количества ответов
 }
 
 const commentSchema = new Schema<IComment>(
@@ -15,6 +17,8 @@ const commentSchema = new Schema<IComment>(
     content: { type: String, required: true },
     likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     likesCount: { type: Number, default: 0 },
+    replies: [{ type: Schema.Types.ObjectId, ref: 'Comment' }], 
+    repliesCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

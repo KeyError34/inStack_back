@@ -26,4 +26,5 @@ router.put(
 );
 router.delete('/:postId', jwtMiddleware, postController.deletePost)
 router.post('/:postId/like', jwtMiddleware, postController.toggleLike)
+router.post('/:postId/repost', jwtMiddleware, postController.addRepost);
 export default router;

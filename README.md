@@ -350,8 +350,56 @@ API
     }
 
    - POST (reposts)
-   
+    import axios from 'axios';
 
+    // URL API, где пост с репостом
+    const apiUrl = 'http://localhost:3333/api/posts';
+
+    const repostPost = async (postId, token) => {
+      try {
+        // Отправка POST-запроса с использованием axios
+        const response = await axios.post(
+          ${apiUrl}/${postId}/repost,  // Подставляем postId в URL
+          {},
+          {
+            headers: {
+              Authorization: Bearer ${token},  // Добавляем токен в заголовки
+            },
+          }
+        );
+
+        // Логируем успешный ответ
+        console.log('Post reposted:', response.data);
+      } catch (error) {
+        // Обработка ошибок
+        console.error('Error reposting post:', error.response ? error.response.data : error.message);
+      }
+    };
+   - answer
+
+   {
+    "message": "Post reposted successfully",
+    "data": {
+        "_id": "6787868b6532dab047cba1ad",
+        "user": "677c2bdbc5312806cf1036ae",
+        "content": "love",
+        "imageUrls": [],
+        "videoUrl": "https://res.cloudinary.com/drwrhviwk/video/upload/v1736935052/rbhxjefbdwfzpcbe77ii.mp4",
+        "likesCount": 0,
+        "likes": [],
+        "commentsCount": 1,
+        "comments": [
+            "67878d08f0436e55ec43d0e9"
+        ],
+        "repostsCount": 1,
+        "reposts": [
+            "677c2bdbc5312806cf1036ae"
+        ],
+        "createdAt": "2025-01-15T09:57:31.672Z",
+        "updatedAt": "2025-01-15T11:48:02.341Z",
+        "__v": 7
+      }
+     }
 4. Comment
 
   -  POST
