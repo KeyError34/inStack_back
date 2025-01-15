@@ -25,4 +25,5 @@ router.put(
   postController.editPost
 );
 router.delete('/:postId', jwtMiddleware, postController.deletePost)
+router.post('/:postId/like', jwtMiddleware, postController.toggleLike)
 export default router;

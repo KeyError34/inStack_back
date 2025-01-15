@@ -1,14 +1,8 @@
-// тут this.uploadToCloudinary this не сработает
-// ну или нужно будет сделать один экземпляр и использовать его
-// и получается что вызывается статик метод который дергает обычный
-//  метод а так как экземпляра конкретного нет то нет и контекста
-// например обработки вынести
-// и обращается к uploadToCloudinary либо как к статик методу
-//  но тогда его нужно будет сделать статик либо иерархию классов
-//  поменять поскольку ты все равно ооп пишешь
 
+import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import Post from '../models/Post';
+import { Types } from 'mongoose';
 import { FileCompressor } from '../utils/fileCompressor';
 import { FileUploader } from '../utils/fileUplouder';
 import { sendResponse } from '../utils/responseUtils';
@@ -93,35 +87,52 @@ class PostController {
       });
     }
   }
-  // Получение поста по id
+
   public async getPost(req: Request, res: Response): Promise<void> {
     try {
+      console.log('Registered models:', mongoose.modelNames());
       const { postId } = req.params;
+
+      console.log('Received postId:', postId); 
+
+      if (!mongoose.Types.ObjectId.isValid(postId)) {
+        console.log('Invalid post ID:', postId);
+        return sendResponse(res, 400, { message: 'Invalid post ID' });
+      }
+
       const post = await Post.findById(postId)
         .populate('user', 'username avatar')
-        .populate('comments', 'username avatar')
+        .populate({
+          path: 'comments',
+          populate: { path: 'user', select: 'username avatar' },
+        })
         .populate('reposts', 'username avatar');
+
+      console.log('Post found:', post); 
+
       if (!post) {
         return sendResponse(res, 404, { message: 'Post not found' });
       }
+
       return sendResponse(res, 200, {
-        message: 'Post successfully getted',
+        message: 'Post retrieved successfully',
         data: post,
       });
     } catch (error) {
+      console.error('Error retrieving post:', error); 
       return sendResponse(res, 500, {
-        message: 'Error getting post',
-        data: {
-          error: error instanceof Error ? error.message : 'Unknown error',
-        },
+        message: 'Error retrieving post',
+        data: { error },
       });
     }
   }
+  public async getAllPost(req: Request, res: Response): Promise<void> {}
+
   public async editPost(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
       const userId = req.user?.id;
-      const { content, imageUrls, videoUrl } = req.body;
+      const { content, videoUrl } = req.body;
       const post = await Post.findById(postId);
       if (!post) {
         return sendResponse(res, 404, { message: 'Post not found' });
@@ -207,7 +218,6 @@ class PostController {
       }
 
       // Удаление файлов из Cloudinary
-      // Удаляем изображения
       if (post.imageUrls && post.imageUrls.length > 0) {
         for (const imageUrl of post.imageUrls) {
           const publicId = extractPublicId(imageUrl);
@@ -236,6 +246,39 @@ class PostController {
       return sendResponse(res, 500, {
         message: 'Error deleting post',
       });
+    }
+  }
+  public async toggleLike(req: Request, res: Response): Promise<void> {
+    try {
+      const { postId } = req.params;
+      const userId = req.user?.id;
+
+      const post = await Post.findById(postId);
+      if (!post) {
+        return sendResponse(res, 404, { message: 'Post not found' });
+      }
+
+      // Если лайк уже поставлен — удаляем лайк
+      if (userId && post.likes.includes(new Types.ObjectId(userId))) {
+        // Удаляем лайк и уменьшаем счетчик
+        post.likes = post.likes.filter((like) => like.toString() !== userId);
+        post.likesCount -= 1;
+      } else {
+        // Если лайк не поставлен — добавляем лайк и увеличиваем счетчик
+        post.likes.push(new Types.ObjectId(userId));
+        post.likesCount += 1;
+      }
+
+      await post.save();
+
+      return sendResponse(res, 200, {
+        message: post.likes.includes(new Types.ObjectId(userId))
+          ? 'Post liked successfully'
+          : 'Post unliked successfully',
+        data: post,
+      });
+    } catch (error) {
+      return sendResponse(res, 500, { message: 'Error toggling like' });
     }
   }
 }

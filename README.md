@@ -97,6 +97,7 @@ API
       }
 
 3.  Post
+  
   *-* POST 
     link to create
     http://localhost:3333/api/post/create
@@ -173,7 +174,7 @@ API
   async function getPost(postId) {
     try {
       // Отправляем GET-запрос на сервер
-      const response = await axios.get(http://localhost:5000/post/${postId});
+      const response = await axios.get(http://localhost:3333/post/${postId});
 
       // Если запрос успешен, обработаем данные
       console.log('Post data:', response.data);
@@ -232,7 +233,7 @@ API
   formData.append('video', videoFile); // Замените videoFile на ваш файл видео
 
   // Отправка запроса через Axios с использованием токена из localStorage
-  axios.put(http://localhost:5000/post/${postId}, formData, {
+  axios.put(http://localhost:3333/post/${postId}, formData, {
     headers: {
       'Authorization': Bearer ${token},
       'Content-Type': 'multipart/form-data',
@@ -282,7 +283,7 @@ API
           return;
         }
 
-        const response = await axios.delete(http://localhost:3000/api/post/${postId}, {
+        const response = await axios.delete(http://localhost:3333/api/post/${postId}, {
           headers: {
             Authorization: Bearer ${token},
           },
@@ -302,8 +303,159 @@ API
   {
     "message": "Post and associated files deleted successfully"
   }
+ 
+  - Like (POST)
+  import axios from 'axios';
 
-4. User
+    // Функция для отправки запроса на сервер для переключения лайка
+    const toggleLike = async (postId, token) => {
+      try {
+        const response = await axios.post(
+          http://localhost:3333/api/post/${postId}/like, // Замените URL на ваш
+          {},
+          {
+            headers: {
+              Authorization: Bearer ${token}, // Если используется авторизация
+            },
+          }
+        );
+        console.log(response.data.message); // Либо используйте данные ответа
+      } catch (error) {
+        console.error('Error toggling like:', error.response?.data?.message || error.message);
+      }
+    };
+
+    - answer
+
+    {
+    "message": "Post unliked successfully",
+    "data": {
+        "_id": "6787868b6532dab047cba1ad",
+        "user": "677c2bdbc5312806cf1036ae",
+        "content": "love",
+        "imageUrls": [],
+        "videoUrl": "https://res.cloudinary.com/drwrhviwk/video/upload/v1736935052/rbhxjefbdwfzpcbe77ii.mp4",
+        "likesCount": 0,
+        "likes": [],
+        "commentsCount": 1,
+        "comments": [
+            "67878d08f0436e55ec43d0e9"
+        ],
+        "repostsCount": 0,
+        "reposts": [],
+        "createdAt": "2025-01-15T09:57:31.672Z",
+        "updatedAt": "2025-01-15T11:21:28.209Z",
+        "__v": 6
+        }
+    }
+
+   - POST (reposts)
+   
+
+4. Comment
+
+  -  POST
+
+    import axios from 'axios';
+
+    const addComment = async (postId, content, token) => {
+      try {
+        const response = await axios.post(
+          http://localhost:3333/api/post/${postId}/comment, 
+          { content },
+          {
+            headers: {
+              Authorization: Bearer ${token},
+            },
+          }
+        );
+        console.log('Comment added:', response.data);
+      } catch (error) {
+        console.error('Error adding comment:', error.response?.data || error.message);
+      }
+    };
+
+    Параметры:
+
+    postId: ID поста, к которому добавляется комментарий.
+
+    content: Содержимое комментария.
+
+    token: JWT токен для аутентификации.
+
+
+  - PUT
+
+    import axios from 'axios';
+
+    const editComment = async (commentId, content, token) => {
+      try {
+        const response = await axios.put(
+          http://localhost:3000/api/comment/${commentId}, 
+          { content },
+          {
+            headers: {
+              Authorization: Bearer ${token},
+            },
+          }
+        );
+        console.log('Comment updated:', response.data);
+      } catch (error) {
+        console.error('Error updating comment:', error.response?.data || error.message);
+      }
+    };
+
+    Параметры:
+
+    commentId: ID комментария, который нужно отредактировать.
+
+    content: Обновленное содержимое комментария.
+
+    token: JWT токен для аутентификации.
+
+
+ - DELETE
+
+    import axios from 'axios';
+
+    const deleteComment = async (commentId, token) => {
+      try {
+        const response = await axios.delete(
+          http://localhost:3000/api/comment/${commentId}, 
+          {
+            headers: {
+              Authorization: Bearer ${token},
+            },
+          }
+        );
+        console.log('Comment deleted:', response.data);
+      } catch (error) {
+        console.error('Error deleting comment:', error.response?.data || error.message);
+      }
+    };
+
+    Параметры:
+
+    commentId: ID комментария, который нужно удалить.
+
+    token: JWT токен для аутентификации.
+
+
+        Пример использования:
+
+        const token = 'your-jwt-token'; // ваш JWT токен
+
+        // Добавление комментария
+        addComment('12345', 'This is a new comment!', token);
+
+        // Редактирование комментария
+        editComment('67890', 'This is an updated comment!', token);
+
+        // Удаление комментария
+        deleteComment('67890', token);
+
+
+5. User
  -  POST (create new)
  - http://localhost:3333/api/profile 
 
@@ -365,7 +517,7 @@ API
     }
   };
   
-5.Avatar 
+6.Avatar 
  - POST /upload-avatar
    http://localhost:3333/api/upload-avata
    +

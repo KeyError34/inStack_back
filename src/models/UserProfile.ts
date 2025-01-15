@@ -17,6 +17,7 @@ export interface IUserProfile extends Document {
   following: Types.ObjectId[]; // Подписки
   followersCount: number;
   followingCount: number;
+  repostedPosts:Types.ObjectId[]
 }
 
 const userProfileSchema = new Schema<IUserProfile>(
@@ -42,6 +43,7 @@ const userProfileSchema = new Schema<IUserProfile>(
     following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
+    repostedPosts:[{type: Schema.Types.ObjectId, ref: 'Post'}]
   },
   { timestamps: true }
 );

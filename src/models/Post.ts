@@ -22,7 +22,7 @@ const postSchema = new Schema<IPost>(
     likesCount: { type: Number, default: 0 },
     likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     commentsCount: { type: Number, default: 0 },
-    comments: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     repostsCount: { type: Number, default: 0 },
     reposts: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
