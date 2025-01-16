@@ -1,6 +1,7 @@
 import { Schema, model, Document, Types } from 'mongoose';
+import { IUser } from './User';
 export interface IUserProfile extends Document {
-  user: Types.ObjectId;
+  user: IUser |Types.ObjectId;
   avatar: Buffer;
   avatarContentType?: string;
   bio: string;

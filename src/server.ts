@@ -7,6 +7,7 @@ import postRouter from './routes/postRouter';
 import userRouter from './routes/userRouter';
 import avatarRouter from './routes/avatarRouter';
 import commentRouter from './routes/commentRouter'
+import followRouter from './routes/followRouter'
 class AppServer {
   private app: Application;
   private port: number;
@@ -37,6 +38,7 @@ class AppServer {
     this.app.use('/api', userRouter)
     this.app.use('/api', avatarRouter);
     this.app.use('/api', commentRouter);
+    this.app.use('/api', followRouter);
   }
   public startServer(): void {
     this.app.listen(this.port, () => {

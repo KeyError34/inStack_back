@@ -482,25 +482,31 @@ API
       }
     };
 
-    Параметры:
 
-    commentId: ID комментария, который нужно удалить.
+   - POST(reply)
+   import axios from 'axios';
 
-    token: JWT токен для аутентификации.
+    const toggleLike = async (commentId, token) => {
+      try {
+        const response = await axios.post(
+          http://localhost:3333/api/comments/${commentId}/toggle-like,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: Bearer ${token},
+            },
+          }
+        );
+
+        console.log(response.data.message, response.data.data);
+        return response.data;
+      } catch (error) {
+        console.error('Ошибка при смене лайка:', error.response?.data || error.message);
+      }
+    };
 
 
-        Пример использования:
-
-        const token = 'your-jwt-token'; // ваш JWT токен
-
-        // Добавление комментария
-        addComment('12345', 'This is a new comment!', token);
-
-        // Редактирование комментария
-        editComment('67890', 'This is an updated comment!', token);
-
-        // Удаление комментария
-        deleteComment('67890', token);
 
 
 5. User
@@ -615,3 +621,48 @@ API
         console.error('Error getting avatar:', error);
       }
     };
+
+7. FOLLOW 
+   GET
+   - mport axios from 'axios';
+
+    const API_BASE_URL = 'http://localhost:3333/api';
+    const token = 'YOUR_JWT_TOKEN';
+
+    // Получить список подписок
+    async function getFollowing() {
+      try {
+        const response = await axios.get(${API_BASE_URL}/following, {
+          headers: { Authorization: Bearer ${token} },
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error(error.response?.data || error.message);
+      }
+    }
+
+    // Получить список подписчиков
+    async function getFollowers() {
+      try {
+        const response = await axios.get(${API_BASE_URL}/followers, {
+          headers: { Authorization: Bearer ${token} },
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error(error.response?.data || error.message);
+      }
+    }
+
+
+   - const toggleFollow = async (username: string) => {
+      try {
+        const response = await axios.post(/api/follow/username/${username}, {}, {
+          headers: { Authorization: Bearer ${localStorage.getItem('token')} },
+        });
+        console.log(response.data.message);
+      } catch (error) {
+        console.error(error.response?.data?.message || 'Ошибка');
+      }
+    };
+
+  
