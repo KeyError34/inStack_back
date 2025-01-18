@@ -16,7 +16,7 @@ class UserProfileController {
         'user',
         'username email fullName'
       );
-
+     console.log("jbhhv nv jgv jgv jhvjg",profile)
       if (!profile) {
         return sendResponse(res, 404, { message: 'Profile not found' });
       }
@@ -31,45 +31,43 @@ class UserProfileController {
     }
   }
   // Получение профиля по username
-static async getProfileByUsername(
-  req: Request,
-  res: Response
-): Promise<void> {
-  try {
-    const { username } = req.params;
-    console.log(`Searching for user with username: ${username}`);
+  static async getProfileByUsername(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { username } = req.params;
+      console.log(`Searching for user with username: ${username}`);
 
-    const user = await User.findOne({ username }).select('_id username');
-    console.log('User found:', user); 
+      const user = await User.findOne({ username }).select('_id username');
+      console.log('User found:', user);
 
-    if (!user) {
-      return sendResponse(res, 404, { message: 'User not found' });
-    }
+      if (!user) {
+        return sendResponse(res, 404, { message: 'User not found' });
+      }
 
-    
-    const profile = await UserProfile.findOne({ user: user._id }).populate(
-      'user',
-      'username email fullName'
-    );
-    console.log('Profile found:', profile); 
+      const profile = await UserProfile.findOne({ user: user._id }).populate(
+        'user',
+        'username email fullName'
+      );
+      console.log('Profile found:', profile);
 
-    if (profile === null) {
-      
+      if (profile === null) {
+        return sendResponse(res, 200, {
+          message: 'Profile not found, returning only user data',
+          data: user,
+        });
+      }
+
       return sendResponse(res, 200, {
-        message: 'Profile not found, returning only user data',
-        data: user,
+        message: 'Profile found',
+        data: profile,
       });
+    } catch (error) {
+      console.error('Error:', error);
+      return sendResponse(res, 500, { message: 'Server error' });
     }
-
-    return sendResponse(res, 200, {
-      message: 'Profile found',
-      data: profile,
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    return sendResponse(res, 500, { message: 'Server error' });
   }
-}
   // Создать новый профиль пользователя (POST)
 
   static async createProfile(req: Request, res: Response): Promise<void> {

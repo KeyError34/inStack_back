@@ -52,7 +52,7 @@ class AuthController {
         username,
         email,
         fullName,
-        password: hashedPassword,
+        passwormaled: hashedPassword,
       });
 
       // Создание профиля для нового пользователя
@@ -60,6 +60,14 @@ class AuthController {
         user: newUser._id,
         bio: '',
         gender: 'other',
+        address: {
+          city: '', // или значение по умолчанию
+          state: '', // или значение по умолчанию
+          country: '', // или значение по умолчанию
+        },
+        interests: [],
+        occupation: '',
+        education: '',
         followersCount: 0,
         followingCount: 0,
         repostedPosts: [],

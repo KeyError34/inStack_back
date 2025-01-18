@@ -7,7 +7,7 @@ export interface IUserProfile extends Document {
   bio: string;
   gender: 'male' | 'female' | 'other';
   address: {
-    city?: string;
+    city?: string; 
     state?: string;
     country?: string;
   };
