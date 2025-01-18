@@ -2,7 +2,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 import { IUser } from './User';
 export interface IUserProfile extends Document {
   user: IUser |Types.ObjectId;
-  avatar: Buffer;
+  avatar: String;
   avatarContentType?: string;
   bio: string;
   gender: 'male' | 'female' | 'other';
@@ -24,7 +24,7 @@ export interface IUserProfile extends Document {
 const userProfileSchema = new Schema<IUserProfile>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    avatar: { type: Buffer },
+    avatar: { type: String },
     avatarContentType: { type: String },
     bio: { type: String, default: '' },
     gender: {

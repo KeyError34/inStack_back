@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
 import { sendResponse } from '../utils/responseUtils';
 import JwtService from '../utils/jwt';
+import UserProfile from '../models/UserProfile';
+import { Types } from 'mongoose';
 class AuthController {
   static async register(req: Request, res: Response): Promise<void> {
     try {
@@ -53,10 +55,33 @@ class AuthController {
         password: hashedPassword,
       });
 
+      // Создание профиля для нового пользователя
+      const newUserProfile = new UserProfile({
+        user: newUser._id,
+        bio: '',
+        gender: 'other',
+        followersCount: 0,
+        followingCount: 0,
+        repostedPosts: [],
+      });
+
+      // Сохранение профиля пользователя
+      await newUserProfile.save();
+
+      // Привязка профиля к пользователю
+      newUser.profile = newUserProfile._id as Types.ObjectId;
+
+      // Сохранение пользователя с привязанным профилем
       await newUser.save();
 
       return sendResponse(res, 201, {
         message: 'User registered successfully',
+        data: {
+          username: newUser.username,
+          email: newUser.email,
+          fullName: newUser.fullName,
+          profile: newUserProfile,
+        },
       });
     } catch (error) {
       console.error(error);
@@ -65,21 +90,30 @@ class AuthController {
   }
   static async login(req: Request, res: Response): Promise<void> {
     try {
-      const { username, email, password } = req.body;
-      if ((!username && !password) || (!email && !password)) {
+      const { emailOrUsername, password } = req.body; // Используйте emailOrUsername, чтобы принимать одно из полей
+
+      if (!emailOrUsername || !password) {
         return sendResponse(res, 400, {
-          message: 'Oll feild are required',
+          message: 'Both email/username and password are required',
         });
       }
-      const user = await User.findOne({ $or: [{ username }, { email }] });
+
+      // Проверяем, является ли emailOrUsername email'ом или username
+      const user = await User.findOne({
+        $or: [{ username: emailOrUsername }, { email: emailOrUsername }],
+      });
+
       if (!user) {
         return sendResponse(res, 400, { message: 'Invalid credentials' });
       }
+
+      // Генерация токена
       const token = JwtService.generateToken({
         id: user._id,
         username: user.username,
         role: user.role,
       });
+
       return sendResponse(res, 200, {
         message: 'Login successful',
         token,

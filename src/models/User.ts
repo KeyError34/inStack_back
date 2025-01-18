@@ -6,7 +6,7 @@ export interface IUser extends Document {
   fullName: string;
   password: string;
   mustChangePassword: boolean;
-  role: 'guest' | 'user' | 'admin' | 'moderator';
+  role:  'user' | 'admin' | 'moderator';
   profile: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
