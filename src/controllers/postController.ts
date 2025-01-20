@@ -1,13 +1,30 @@
-
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import Post from '../models/Post';
 import UserProfile from '../models/UserProfile';
+import { IUserProfile } from '../models/UserProfile';
+import User from '../models/User';
+import { IPost } from '../models/Post';
 import { Types } from 'mongoose';
 import { FileCompressor } from '../utils/fileCompressor';
 import { FileUploader } from '../utils/fileUplouder';
 import { sendResponse } from '../utils/responseUtils';
 import { extractPublicId } from '../utils/extractPublicId';
+
+
+
+export interface IFormattedPost {
+  _id: Types.ObjectId;
+  content: string;
+  imageUrls: string[];
+  videoUrl: string;
+  createdAt: Date | string;
+  user: {
+    username: string;
+    avatar?: string;
+  };
+  likesCount: number;
+}
 class PostController {
   // Создание поста
   public async createPost(req: Request, res: Response): Promise<void> {
@@ -102,14 +119,29 @@ class PostController {
       }
 
       const post = await Post.findById(postId)
-        .populate('user', 'username avatar')
+        .populate('user', 'username profile') // Подтягиваем данные пользователя, создавшего пост
         .populate({
           path: 'comments',
-          populate: { path: 'user', select: 'username avatar' },
+          populate: [
+            {
+              path: 'user',
+              select: 'username profile',
+              populate: { path: 'profile', select: 'avatar' },
+            }, // Данные пользователя, оставившего комментарий
+            {
+              path: 'replies',
+              select: 'content user',
+              populate: { path: 'user', select: 'username' },
+            }, // Ответы на комментарии
+          ],
         })
-        .populate('reposts', 'username avatar');
-
-      console.log('Post found:', post);
+        .populate({
+          path: 'likes',
+          select: 'username profile',
+          populate: { path: 'profile', select: 'avatar' },
+        })
+        .sort({ createdAt: -1 })
+        .exec();
 
       if (!post) {
         return sendResponse(res, 404, { message: 'Post not found' });
@@ -127,7 +159,117 @@ class PostController {
       });
     }
   }
-  public async getAllPost(req: Request, res: Response): Promise<void> {}
+
+
+  public async getAllUserPost(req: Request, res: Response): Promise<void> {
+    try {
+      // Получаем имя пользователя из параметров URL
+      const { username } = req.params;
+
+      if (!username) {
+        sendResponse(res, 400, { message: 'Username is required' });
+        return;
+      }
+
+      // Ищем пользователя по имени пользователя
+      const user = await User.findOne({ username }).select(
+        '_id username profile'
+      );
+      if (!user) {
+        sendResponse(res, 404, { message: 'User not found' });
+        return;
+      }
+
+      // Ищем посты, созданные этим пользователем
+      const userPosts = await Post.find({ user: user._id })
+        .populate('user', 'username profile') // Подтягиваем данные пользователя, создавшего пост
+        .populate({
+          path: 'comments',
+          populate: [
+            {
+              path: 'user',
+              select: 'username profile',
+              populate: { path: 'profile', select: 'avatar' },
+            }, // Данные пользователя, оставившего комментарий
+            {
+              path: 'replies',
+              select: 'content user',
+              populate: { path: 'user', select: 'username' },
+            }, // Ответы на комментарии
+          ],
+        })
+        .sort({ createdAt: -1 })
+        .exec();
+
+      // Форматируем данные: преобразуем likes в массив строковых ID
+      const formattedPosts = userPosts.map((post) => ({
+        ...post.toObject(),
+        likes: post.likes.map((like: any) => like._id.toString()), // Преобразование объектов в строки
+      }));
+      console.log(formattedPosts)
+      sendResponse(res, 200, {message:'user post', data: formattedPosts });
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+      sendResponse(res, 500, { message: 'Internal Server Error' });
+    }
+  }
+
+  public async getPostsForFollowing(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const currentUserId = req.user?.id;
+
+      if (!currentUserId) {
+        sendResponse(res, 400, { message: 'User ID is required' });
+        return;
+      }
+
+      const userProfile = await UserProfile.findOne({
+        user: currentUserId,
+      }).populate('following');
+
+      if (!userProfile) {
+        sendResponse(res, 404, { message: 'User profile not found' });
+        return;
+      }
+
+      const followingUsers = userProfile.following;
+
+      if (!followingUsers.length) {
+        sendResponse(res, 200, {
+          message: 'No posts found',
+          data: { posts: [] },
+        });
+        return;
+      }
+
+      const posts = await Post.find({ user: { $in: followingUsers } })
+        .sort({ createdAt: -1 })
+        .populate('user', 'username avatar') // Заполняем данные пользователя
+        .lean();
+
+      const formattedPosts = posts.map((post) => ({
+        _id: post._id,
+        content: post.content || '',
+        imageUrls: post.imageUrls || [],
+        videoUrl: post.videoUrl || '',
+        createdAt: post.createdAt.toISOString(),
+        user: post.user,
+        likesCount: post.likesCount,
+        likes: post.likes.map((likeId) => likeId.toString()), // Преобразуем ObjectId в строки
+      }));
+      console.log(formattedPosts);
+      sendResponse(res, 200, {
+        message: 'Posts fetched successfully',
+        data: { posts: formattedPosts },
+      });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      sendResponse(res, 500, { message: 'Server error' });
+    }
+  }
 
   public async editPost(req: Request, res: Response): Promise<void> {
     try {

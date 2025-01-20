@@ -11,6 +11,8 @@ export interface IPost extends Document {
   commentsCount: number;
   reposts: Types.ObjectId[];
   repostsCount: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const postSchema = new Schema<IPost>(
@@ -25,8 +27,10 @@ const postSchema = new Schema<IPost>(
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     repostsCount: { type: Number, default: 0 },
     reposts: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    createdAt: { type: Date, default: Date.now }, // Явное указание createdAt
+    updatedAt: { type: Date, default: Date.now }, // Явное указание updatedAt
   },
-  { timestamps: true }
+  { timestamps: true } // Опция timestamps все равно остается, чтобы Mongoose автоматически обновлял эти поля.
 );
 
 const Post = model<IPost>('Post', postSchema);

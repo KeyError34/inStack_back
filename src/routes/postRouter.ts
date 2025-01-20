@@ -14,7 +14,9 @@ router.post(
   ]),
   postController.createPost
 );
-router.get('/:postId', postController.getPost);
+
+router.get('/user-posts/:username', postController.getAllUserPost);
+router.get('/following', jwtMiddleware, postController.getPostsForFollowing)
 router.put(
   '/:postId',
   jwtMiddleware,
@@ -24,6 +26,7 @@ router.put(
   ]),
   postController.editPost
 );
+router.get('/:postId', postController.getPost);
 router.delete('/:postId', jwtMiddleware, postController.deletePost)
 router.post('/:postId/like', jwtMiddleware, postController.toggleLike)
 router.post('/:postId/repost', jwtMiddleware, postController.addRepost);
