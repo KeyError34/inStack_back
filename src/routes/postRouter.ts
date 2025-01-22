@@ -17,6 +17,7 @@ router.post(
 
 router.get('/user-posts/:username', postController.getAllUserPost);
 router.get('/following', jwtMiddleware, postController.getPostsForFollowing)
+router.get('/all-users-posts',postController.getAllUsers)
 router.put(
   '/:postId',
   jwtMiddleware,

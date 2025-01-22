@@ -6,7 +6,7 @@ export interface IUser extends Document {
   fullName: string;
   password: string;
   mustChangePassword: boolean;
-  role:  'user' | 'admin' | 'moderator';
+  role: 'user' | 'admin' | 'moderator';
   profile: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -21,10 +21,14 @@ const userSchema = new Schema<IUser>(
     mustChangePassword: { type: Boolean, default: false },
     role: {
       type: String,
-      enum: [ 'user', 'admin', 'moderator'],
+      enum: ['user', 'admin', 'moderator'],
       default: 'user',
     },
-    profile: { type: Schema.Types.ObjectId, ref: 'UserProfile' },
+    profile: {
+      type: Schema.Types.ObjectId,
+      ref: 'UserProfile',
+      required: true,
+    },
   },
   { timestamps: true }
 );
