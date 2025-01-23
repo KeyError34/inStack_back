@@ -8,5 +8,6 @@ router.get('/profile', jwtMiddleware, UserProfileController.getProfile);
 router.get('/profile/:username', UserProfileController.getProfileByUsername);
 router.post('/profile', jwtMiddleware, UserProfileController.createProfile);
 router.put('/profile', jwtMiddleware, UserProfileController.updateProfile);
+router.post('/search', UserProfileController.searchUsers)
 
 export default router;

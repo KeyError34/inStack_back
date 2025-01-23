@@ -16,7 +16,7 @@ class UserProfileController {
         'user',
         'username email fullName'
       );
-     console.log("jbhhv nv jgv jgv jhvjg",profile)
+      console.log('jbhhv nv jgv jgv jhvjg', profile);
       if (!profile) {
         return sendResponse(res, 404, { message: 'Profile not found' });
       }
@@ -121,6 +121,26 @@ class UserProfileController {
     } catch (error) {
       console.error(error);
       return sendResponse(res, 500, { message: 'Server error' });
+    }
+  }
+
+  static async searchUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const { username } = req.body; 
+
+      if (!username || typeof username !== 'string') {
+        res.status(400).json({ message: 'Введите часть имени для поиска' });
+        return;
+      }
+
+      const users = await User.find({
+        username: { $regex: username, $options: 'i' }, 
+      }).select('username');
+
+      res.status(200).json(users); 
+    } catch (error) {
+      console.error('Ошибка поиска пользователей:', error);
+      res.status(500).json({ message: 'Ошибка сервера, попробуйте позже' });
     }
   }
 }
