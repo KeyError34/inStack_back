@@ -5,7 +5,8 @@ const connectDB = async (): Promise<void> => {
   try {
     await mongoose.connect(uri || '', {
       user: process.env.DB_USER || 'root',
-      pass: process.env.DB_PASS || 'root',
+      pass: process.env.DB_PASS || '666777lyly',
+      dbName: process.env.DB_NAME || 'instack',
     });
     console.log('Connected to Mongo DB');
   } catch (error) {
@@ -15,3 +16,8 @@ const connectDB = async (): Promise<void> => {
   }
 }
 export default connectDB;
+
+// {
+//       user: process.env.DB_USER || 'root',
+//       pass: process.env.DB_PASS || 'root',
+//     }

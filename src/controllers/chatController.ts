@@ -1,137 +1,82 @@
-
-import { Socket } from 'socket.io';
-import User, { IUser } from '../models/User';
-import Chat, { IChat } from '../models/Chat';
+// controllers/ChatController.ts
+import { Request, Response } from 'express';
+import Chat from '../models/Chat';
 import Message from '../models/Message';
-import { Types } from 'mongoose';
+import User from '../models/User';
 
-class MessengerController {
-  private io: any;
-  private users: Map<string, Socket> = new Map();
+class ChatController {
+   public async createChat(req: Request, res: Response): Promise<void> {
+    const { username1, username2 } = req.body;
 
-  constructor(io: any) {
-    this.io = io;
-  }
-
-  // Регистрация пользователя
-  public connectUser(socket: Socket): void {
-    socket.on('register', (username: string) => {
-      this.users.set(username, socket);
-      socket.data.username = username; // Сохраняем username в data сокета
-      console.log(`${username} подключен.`);
-    });
-  }
-
-  // Создание чата
-  public async createChat(socket: Socket, { currentUsername, otherUsername }: { currentUsername: string; otherUsername: string }): Promise<void> {
     try {
-      // Проверяем наличие текущего пользователя
-      const currentUser = await User.findOne({ username: currentUsername });
-      if (!currentUser) {
-        socket.emit('error', 'Current user not found');
-        return;
-      }
+      const user1 = await User.findOne({ username: username1 });
+      const user2 = await User.findOne({ username: username2 });
 
-      // Проверяем наличие другого пользователя
-      const otherUser = await User.findOne({ username: otherUsername });
-      if (!otherUser) {
-        socket.emit('error', 'Other user not found');
-        return;
-      }
+      if (!user1 || !user2) {
+         res.status(404).json({ message: 'One or both users not found' });
+     return }
 
-      // Создаем или получаем существующий чат
-      const chat = await this.createChatBetweenUsers(currentUser._id, otherUser._id);
+      const chat = new Chat({
+        participants: [user1._id, user2._id],
+        chatName: `${username1} & ${username2}`,
+      });
 
-      // Подключаем сокеты обоих пользователей к комнате чата
-      socket.join(chat._id.toString());
-      const otherUserSocket = this.users.get(otherUser.username);
-      if (otherUserSocket) {
-        otherUserSocket.join(chat._id.toString());
-      }
-
-      // Уведомляем пользователей о создании чата
-      socket.emit('chatCreated', chat);
-      if (otherUserSocket) {
-        otherUserSocket.emit('chatCreated', chat);
-      }
-
-      console.log(`Чат создан между ${currentUsername} и ${otherUsername}`);
+      await chat.save();
+       res.status(201).json(chat);
     } catch (error) {
-      console.error('Error creating chat:', error);
-      socket.emit('error', 'Error creating chat');
+       res.status(500).json({ message: 'Error creating chat', error });
     }
   }
 
-  // Метод для создания нового чата или получения существующего
-  public async createChatBetweenUsers(userId1: Types.ObjectId, userId2: Types.ObjectId): Promise<IChat> {
-    const existingChat = await Chat.findOne({
-      participants: { $all: [userId1, userId2] },
-    });
+   public async sendMessage(req: Request, res: Response): Promise<void> {
+    
 
-    if (existingChat) {
-      return existingChat;
-    }
+     try {
+       const { chatId, senderUsername, receiverUsername, content } = req.body;
+       console.log(senderUsername, receiverUsername);
+       const sender = await User.findOne({ username: senderUsername });
+       
+      const receiver = await User.findOne({ username: receiverUsername });
+      
+      if (!sender || !receiver) {
+        res.status(404).json({ message: 'Sender or receiver not found' });
+      return }
 
-    const newChat = new Chat({
-      participants: [userId1, userId2],
-    });
-
-    return await newChat.save();
-  }
-
-  // Отправка сообщения
-  public async sendMessage(socket: Socket, { chatId, messageContent }: { chatId: string; messageContent: string }): Promise<void> {
-    const currentUsername = socket.data.username; // Берем username текущего пользователя из сокета
-
-    if (!currentUsername) {
-      socket.emit('error', 'User not authenticated');
-      return;
-    }
-
-    try {
-      const chat = await Chat.findById(chatId) as IChat;
+      const chat = await Chat.findById(chatId);
       if (!chat) {
-        socket.emit('error', 'Chat not found');
-        return;
-      }
-
-      // Находим текущего пользователя
-      const currentUser = await User.findOne({ username: currentUsername });
-      if (!currentUser) {
-        socket.emit('error', 'Current user not found');
-        return;
-      }
-
-      // Находим получателя сообщения
-      const receiver = chat.participants.find((p) => !p.equals(currentUser._id));
-      if (!receiver) {
-        socket.emit('error', 'Receiver not found in chat');
-        return;
-      }
+         res.status(404).json({ message: 'Chat not found' });
+      return}
 
       const message = new Message({
-        content: messageContent,
-        sender: currentUser._id,
-        receiver: receiver,
+        content,
+        sender: sender._id,
+        receiver: receiver._id,
         chat: chat._id,
+        createdAt: new Date(),
+        read: false,
       });
 
       await message.save();
 
-      // Отправляем сообщение всем участникам чата
-      this.io.to(chat._id.toString()).emit('newMessage', {
-        sender: currentUsername,
-        content: message.content,
-        createdAt: message.createdAt,
-      });
+      chat.lastMessage = message._id;
+      await chat.save();
 
-
-console.log(`Новое сообщение от ${currentUsername}: ${message.content}`);
+       res.status(201).json(message);
     } catch (error) {
-      console.error('Error sending message:', error);
-      socket.emit('error', 'Error sending message');
+       res.status(500).json({ message: 'Error sending message', error });
+    }
+  }
+
+  public async getMessages(req: Request, res: Response): Promise<void> {
+    const { chatId } = req.params;
+
+    try {
+      const messages = await Message.find({ chat: chatId }).populate('sender receiver');
+      res.status(200).json(messages);
+    } catch (error) {
+       res.status(500).json({ message: 'Error fetching messages', error });
     }
   }
 }
 
-export default MessengerController;
+export default new ChatController();

@@ -2,6 +2,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 
 
 interface IMessage extends Document {
+  _id:Types.ObjectId
   content: string; 
   sender: Types.ObjectId; 
   receiver: Types.ObjectId; 
