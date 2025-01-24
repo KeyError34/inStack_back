@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
 class JwtService {
@@ -12,13 +12,10 @@ class JwtService {
 
   public generateToken(
     payload: Record<string, unknown>,
-    // options?: SignOptions
-    expires?:string 
+    expires?: string
   ): string {
     return jwt.sign(payload, this.secretKey, {
-      // ...options,
-
-      expiresIn: expires || this.expiresIn,
+      expiresIn: '1d' // Используем переданное время жизни или значение по умолчанию
     });
   }
 
