@@ -89,7 +89,7 @@
 // const app = new AppServer();
 // app.startServer();
 
-import express, { Application } from "express";
+import express, { Application,Request,Response } from "express";
 import cors from "cors";
 import http from "http";
 import { Server as SocketIOServer, Socket } from "socket.io";
@@ -160,6 +160,9 @@ class AppServer {
     this.app.use("/api", avatarRouter);
     this.app.use("/api", commentRouter);
     this.app.use("/api", followRouter);
+    this.app.get("/health", (req: Request, res: Response) => {
+      res.send('ok')
+    })
   }
 
   // Устанавливаем middleware для сокетов
