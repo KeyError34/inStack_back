@@ -12,11 +12,13 @@ class JwtService {
 
   public generateToken(
     payload: Record<string, unknown>,
-    options?: SignOptions
+    // options?: SignOptions
+    expires?:string 
   ): string {
     return jwt.sign(payload, this.secretKey, {
-      ...options,
-      expiresIn: this.expiresIn,
+      // ...options,
+
+      expiresIn: expires || this.expiresIn,
     });
   }
 

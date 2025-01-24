@@ -22,7 +22,7 @@ class PasswordResetController {
       }
 
       // Генерация JWT токена (действителен 15 мин)
-      const token = JwtService.generateToken({ email }, { expiresIn: '15m' });
+      const token = JwtService.generateToken({ email },  '15m' );
 
       // Сохранение токена в базе
       await ResetToken.create({
