@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { sendResponse } from '../utils/responseUtils';
-import { Types } from 'mongoose'; // Импортируй Types из mongoose
+import { Types } from 'mongoose';
 
 class CommentController {
   // Добавление комментария

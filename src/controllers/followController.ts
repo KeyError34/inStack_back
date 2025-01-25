@@ -37,8 +37,8 @@ class FollowController {
         return sendResponse(res, 404, { message: 'User profile not found' });
       }
 
-      const targetUserId: Types.ObjectId = targetUser._id as Types.ObjectId; // id пользователя, на которого подписываемся
-      const currentUserId: Types.ObjectId = new Types.ObjectId(userId); // id текущего пользователя
+      const targetUserId: Types.ObjectId = targetUser._id as Types.ObjectId; 
+      const currentUserId: Types.ObjectId = new Types.ObjectId(userId);
 
       const isFollowing: boolean = currentUserProfile.following.some(
         (followId) => followId.equals(targetUserId)

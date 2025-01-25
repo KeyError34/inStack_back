@@ -9,13 +9,13 @@ interface CustomSocket extends Socket {
 }
 class MessengerController {
   private io: any;
-  private users: Map<string, CustomSocket> = new Map(); // Изменено на CustomSocket
+  private users: Map<string, CustomSocket> = new Map(); 
 
   constructor(io: any) {
     this.io = io;
   }
 
-  // Регистрация пользователя в системе
+
   public connectUser(socket: CustomSocket): void {
     if (!socket.user) {
       socket.emit('error', 'User not authenticated');
@@ -32,7 +32,7 @@ class MessengerController {
   // Создание чата между двумя пользователями
   public async createChat(socket: CustomSocket, { currentUsername, otherUsername }: { currentUsername: string; otherUsername: string }): Promise<void> {
     try {
-      const currentUser = socket.user; // Берем текущего пользователя из сокета
+      const currentUser = socket.user; 
       if (!currentUser) {
         socket.emit("error", "User not authenticated");
         return;

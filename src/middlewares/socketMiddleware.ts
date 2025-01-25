@@ -1,9 +1,9 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Socket } from 'socket.io';
-import User, { IUser } from '../models/User'; // Предполагается, что IUser — это интерфейс вашей модели User.
+import User, { IUser } from '../models/User';
 
 interface ISocketWithUser extends Socket {
-  user?: IUser; // Добавляем типизированное поле user в объект socket.
+  user?: IUser; 
 }
 
 const authenticateSocket = async (
@@ -27,7 +27,7 @@ const authenticateSocket = async (
       return next(new Error('User is not found'));
     }
 
-    socket.user = user; // Присваиваем найденного пользователя в socket.user.
+    socket.user = user; 
 
     next();
   } catch (error) {

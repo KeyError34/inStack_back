@@ -23,92 +23,7 @@ export interface IFormattedPost {
   likeId: string;
 }
 class PostController {
-  // Создание поста
-  // public async createPost(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const imageUrls: string[] = [];
-  //     let videoUrl: string | undefined = '';
 
-  //     // Проверяем наличие файлов в запросе
-  //     if (req.files && typeof req.files === 'object') {
-  //       const files = req.files as {
-  //         [fieldname: string]: Express.Multer.File[];
-  //       };
-  //       console.log(files);
-
-  //       // Обработка изображений
-  //       if (files['images']) {
-  //         const images = files['images'];
-  //         for (const image of images) {
-  //           const compressedImage = await FileCompressor.compressImage(
-  //             image.buffer
-  //           );
-  //           const imageUploadUrl = await FileUploader.uploadToCloudinary(
-  //             compressedImage,
-  //             'image'
-  //           );
-  //           if (imageUploadUrl) imageUrls.push(imageUploadUrl);
-  //         }
-  //       }
-
-  //       // Обработка видео
-  //       if (files['video']) {
-  //         const video = files['video'][0];
-  //         const compressedVideo = await FileCompressor.compressVideo(
-  //           video.buffer
-  //         );
-  //         const videoUploadUrl = await FileUploader.uploadToCloudinary(
-  //           compressedVideo,
-  //           'video'
-  //         );
-  //         if (videoUploadUrl) videoUrl = videoUploadUrl;
-  //       }
-  //     }
-
-  //     // Если не загружены изображения или видео, отправляем ошибку
-  //     if (imageUrls.length === 0 && !videoUrl) {
-  //       return sendResponse(res, 400, {
-  //         message: 'No images or videos uploaded',
-  //       });
-  //     }
-
-  //     // Создание поста
-  //     const post = new Post({
-  //       user: req.user?.id,
-  //       content: req.body.content || '',
-  //       imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
-  //       videoUrl: videoUrl ?? undefined,
-  //       likesCount: 0,
-  //       likes: [],
-  //       commentsCount: 0,
-  //       comments: [],
-  //       repostsCount: 0,
-  //       reposts: [],
-  //     });
-
-  //     // Сохраняем пост в базе данных
-  //     await post.save();
-
-  //     // Увеличиваем postsCount для пользователя
-  //     await UserProfile.findOneAndUpdate(
-  //       { user: req.user?.id },
-  //       { $inc: { postsCount: 1 } } // Увеличиваем postsCount на 1
-  //     );
-
-  //     return sendResponse(res, 201, {
-  //       message: 'Post successfully created',
-  //       data: { post_id: post._id, ...post.toObject() },
-  //     });
-  //   } catch (error) {
-  //     console.error('Error creating post:', error);
-  //     return sendResponse(res, 500, {
-  //       message: 'Error creating post',
-  //       data: {
-  //         error: error instanceof Error ? error.message : 'Unknown error',
-  //       },
-  //     });
-  //   }
-  // }
   public async createPost(req: Request, res: Response): Promise<void> {
     try {
       const imageUrls: string[] = [];
@@ -150,14 +65,13 @@ class PostController {
         }
       }
 
-      // Если не загружены изображения или видео, отправляем ошибку
       if (imageUrls.length === 0 && !videoUrl) {
         return sendResponse(res, 400, {
           message: 'No images or videos uploaded',
         });
       }
 
-      // Если content не передано, устанавливаем значение по умолчанию (например, пустую строку)
+      
       const content = req.body.content || '';
 
       // Создание поста
@@ -174,13 +88,11 @@ class PostController {
         reposts: [],
       });
 
-      // Сохраняем пост в базе данных
       await post.save();
-
-      // Увеличиваем postsCount для пользователя
+  
       await UserProfile.findOneAndUpdate(
         { user: req.user?.id },
-        { $inc: { postsCount: 1 } } // Увеличиваем postsCount на 1
+        { $inc: { postsCount: 1 } } 
       );
 
       return sendResponse(res, 201, {
@@ -288,7 +200,7 @@ class PostController {
               $push: {
                 _id: '$comments._id',
                 content: { $ifNull: ['$comments.content', 'No content'] },
-                likes: { $ifNull: ['$comments.likes', []] }, //{ $ifNull: ['$comments.likes', 'No content'] },  Добавляем массив ID пользователей, которые лайкнули комментарий
+                likes: { $ifNull: ['$comments.likes', []] }, 
                 repliesCount: { $ifNull: ['$comments.repliesCount', 0] },
                 username: {
                   $ifNull: ['$comments.userDetails.username', 'Anonymous'],
@@ -325,7 +237,7 @@ class PostController {
   }
   public async getAllUserPost(req: Request, res: Response): Promise<void> {
     try {
-      // Получаем имя пользователя из параметров URL
+  
       const { username } = req.params;
 
       if (!username) {
@@ -333,7 +245,7 @@ class PostController {
         return;
       }
 
-      // Ищем пользователя по имени пользователя и подгружаем профиль
+    
       const user = await User.findOne({ username })
         .select('_id username profile')
         .populate({
@@ -374,12 +286,12 @@ class PostController {
           ],
         })
         .sort({ createdAt: -1 })
-        .lean(); // Используем .lean() для преобразования в обычный объект
+        .lean(); 
 
       // Форматируем данные
       const formattedPosts = userPosts.map((post) => ({
         ...post,
-        likes: post.likes.map((like: any) => like.toString()), // Преобразуем ObjectId в строку
+        likes: post.likes.map((like: any) => like.toString()), 
       }));
 
       sendResponse(res, 200, { message: 'User posts', data: formattedPosts });
@@ -403,8 +315,7 @@ class PostController {
 
       const userProfile = await UserProfile.findOne({
         user: currentUserId,
-      }).populate('following'); // Загрузка пользователей из подписок
-
+      }).populate('following'); 
       if (!userProfile) {
         sendResponse(res, 404, { message: 'User profile not found' });
         return;
@@ -422,11 +333,11 @@ class PostController {
 
       // Запрашиваем посты пользователей из списка подписок
       const posts = await Post.aggregate([
-        { $match: { user: { $in: followingUsers } } }, // Фильтруем посты подписанных пользователей
-        { $sort: { createdAt: -1 } }, // Сортировка по дате создания
+        { $match: { user: { $in: followingUsers } } }, 
+        { $sort: { createdAt: -1 } }, 
         {
           $lookup: {
-            from: 'users', // Название коллекции пользователей
+            from: 'users', 
             localField: 'user',
             foreignField: '_id',
             as: 'userData',
@@ -449,10 +360,10 @@ class PostController {
             imageUrls: 1,
             videoUrl: 1,
             createdAt: 1,
-            likesCount: 1, // Включаем количество лайков
-            likes: 1, // Включаем массив лайков
+            likesCount: 1, 
+            likes: 1, 
             'userData.username': 1,
-            'profileData.avatar': 1, // Прямо выбираем avatar
+            'profileData.avatar': 1, 
           },
         },
       ]);
@@ -478,7 +389,7 @@ class PostController {
         likes: post.likes?.map((likeId: any) => likeId.toString()) || [],
         user: {
           username: post.userData.username,
-          avatar: post.profileData.avatar || '', // Прямо получаем avatar
+          avatar: post.profileData.avatar || '', 
         },
       }));
 
@@ -496,13 +407,13 @@ class PostController {
       const users = await User.aggregate([
         {
           $lookup: {
-            from: 'userprofiles', // Коллекция профилей пользователей
+            from: 'userprofiles', 
             localField: '_id',
             foreignField: 'user',
             as: 'profileData',
           },
         },
-        { $unwind: { path: '$profileData', preserveNullAndEmptyArrays: true } }, // Разворачиваем массив профилей
+        { $unwind: { path: '$profileData', preserveNullAndEmptyArrays: true } }, 
         {
           $lookup: {
             from: 'posts', // Коллекция постов
@@ -697,13 +608,12 @@ class PostController {
         return sendResponse(res, 404, { message: 'Post not found' });
       }
 
-      // Если лайк уже поставлен — удаляем лайк
+   
       if (userId && post.likes.includes(new Types.ObjectId(userId))) {
-        // Удаляем лайк и уменьшаем счетчик
         post.likes = post.likes.filter((like) => like.toString() !== userId);
         post.likesCount -= 1;
       } else {
-        // Если лайк не поставлен — добавляем лайк и увеличиваем счетчик
+       
         post.likes.push(new Types.ObjectId(userId));
         post.likesCount += 1;
       }

@@ -4,7 +4,7 @@ import ResetToken from '../models/ResetToken';
 import User from '../models/User';
 import { sendResponse } from '../utils/responseUtils';
 import sendEmail from '../utils/sendEmail';
-
+import 'dotenv/config'
 import bcrypt from 'bcryptjs';
 
 class PasswordResetController {
@@ -21,10 +21,7 @@ class PasswordResetController {
         return sendResponse(res, 400, { message: 'Email not found' });
       }
 
-      // Генерация JWT токена (действителен 15 мин)
       const token = JwtService.generateToken({ email } );
-
-      // Сохранение токена в базе
       await ResetToken.create({
         email,
         token,
@@ -32,7 +29,7 @@ class PasswordResetController {
       });
 
       // Отправка письма со ссылкой
-      const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+      const resetLink = `${process.env.URI_RESET}/reset-password?token=${token}`;
       await sendEmail(
         {
           to: email,
