@@ -133,9 +133,9 @@ class UserProfileController {
         return;
       }
 
-      const users = await User.find({
+      const users = username? await User.find({
         username: { $regex: username, $options: 'i' }, 
-      }).select('username');
+      }).select('username'):[];
 
       res.status(200).json(users); 
     } catch (error) {
