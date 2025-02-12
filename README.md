@@ -1,3 +1,152 @@
+# inStack_back
+
+## 📌 Project Description
+**inStack_back** is the backend part of a web application, built with TypeScript using Node.js and Express. The project implements an API for user authentication, data management, and interaction with the database.
+
+## 🚀 Features
+- User registration and authentication (JWT)
+- Data validation and processing
+- API for managing entities (products, orders, users, etc.)
+- Security measures (password hashing, protection against SQL injections and XSS)
+- Logging and error handling
+- CI/CD and Docker compatibility
+
+---
+
+## 📦 Installation and Setup
+
+### 1️⃣ Clone the repository:
+```bash
+git clone https://github.com/KeyError34/inStack_back.git
+cd inStack_back
+```
+
+### 2️⃣ Install dependencies:
+```bash
+npm install
+```
+
+### 3️⃣ Configure environment variables:
+Create a `.env` file in the root directory and add the following variables:
+```env
+PORT=5000
+DB_URL=mongodb://localhost:27017/inStack
+JWT_SECRET=your_secret_key
+```
+
+### 4️⃣ Run in development mode:
+```bash
+npm run dev
+```
+
+### 5️⃣ Build and start in production mode:
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 🛠 Technologies Used
+| Technology       | Description |
+|-----------------|------------|
+| **Node.js**     | JavaScript runtime |
+| **Express.js**  | Web framework for REST API |
+| **TypeScript**  | Statically typed JavaScript |
+| **MongoDB / Mongoose** | NoSQL database and ODM |
+| **JWT (jsonwebtoken)** | User authentication |
+| **Bcrypt** | Password hashing |
+| **Docker** | Application containerization |
+| **ESLint & Prettier** | Code linting and formatting |
+| **Jest** | Testing framework |
+
+---
+
+## 📂 Project Structure
+```
+inStack_back/
+│── src/
+│   ├── controllers/      # Request handling logic
+│   ├── models/           # Data models (Mongoose)
+│   ├── routes/           # API routes
+│   ├── middlewares/      # Middleware (auth, validation)
+│   ├── utils/            # Utility functions
+│   ├── config/           # Application configuration
+│   ├── index.ts          # Entry point
+│── tests/                # Tests (Jest)
+│── .env                  # Environment variables
+│── .gitignore            # Git ignore file
+│── Dockerfile            # Docker configuration
+│── package.json          # Dependencies and scripts
+│── tsconfig.json         # TypeScript configuration
+│── README.md             # Documentation
+```
+
+---
+
+## 📋 API Documentation
+For API testing, use **Postman** or **Swagger**.
+
+Example request for user registration:
+```http
+POST /api/auth/register
+```
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+
+Example response:
+```json
+{
+  "message": "User successfully registered",
+  "token": "eyJhbGciOiJIUzI1..."
+}
+```
+
+---
+
+## 🐳 Running with Docker
+1. Build the container:
+```bash
+docker build -t instack-back .
+```
+2. Run the container:
+```bash
+docker run -p 5000:5000 --env-file .env instack-back
+```
+
+---
+
+## ✅ Testing
+Run all tests:
+```bash
+npm test
+```
+
+---
+
+## 🔧 Common Issues & Solutions
+| Error | Possible Solution |
+|--------|------------------|
+| `Error: Cannot connect to DB` | Check the connection string in `.env` |
+| `JWT malformed` | Ensure you are passing the correct token |
+| `CORS error` | Add CORS settings in Express |
+
+---
+
+## 👨‍💻 Author
+[KeyError34](https://github.com/KeyError34) — Project Developer.
+
+---
+
+## 📜 License
+This project is licensed under the **MIT License**.
+
+
+
 API
 
 1. auth
